@@ -27,7 +27,7 @@ _LINE STRUCT
     y2 dd 0
 _LINE ENDS
 
-_RECT STRUCT 
+_RECT STRUCT
     left dd ?
     top dd ?
     right dd ?
@@ -39,7 +39,7 @@ _PAINT STRUCT
     fErase dd ?
     rcPaint _RECT <>
     fRestore dd ?
-    fIncUpdate dd ? 
+    fIncUpdate dd ?
     rgbReserved db 32 dup (?)
 _PAINT ENDS
 
@@ -50,7 +50,7 @@ _NOTIFYICONDATAA STRUCT
     uFlags dd ?
     uCallbackMessage dd ?
     hIcon dq ?
-    szTip db 128 dup (?)
+    szTip dw 64 dup (?)
     dwState dd ?
     dwStateMask dd ?
     szInfo db 256 dup (?)

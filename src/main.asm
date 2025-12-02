@@ -1,7 +1,7 @@
 ;
 ; Name: StickyPin
-; Version: 0.0.1
-; Date: 20-11-2025
+; Version: 0.0.2
+; Date: 02-12-2025
 ; Author: secator
 ; URL: https://secator.com/stickypin/
 ;
@@ -40,6 +40,7 @@ extern RegisterClassW:proc
 extern CreateWindowExW:proc
 extern CreateFontW:proc
 extern ShowWindow:proc
+extern FindWindowW:proc
 extern SetForegroundWindow:proc
 extern SetFocus:proc
 extern SetWindowPos:proc
@@ -67,7 +68,7 @@ extern GetLastError:proc
 .data
     about db "About", 0
     copyright db "Name: StickyPin", 13
-              db "Version: 0.0.1 (20-11-2025)", 13
+              db "Version: 0.0.2 (02-12-2025)", 13
               db "Copyright: secator", 13
               db "URL: https://secator.com/s", 13
               dw 0, 0
@@ -118,6 +119,8 @@ extern GetLastError:proc
          _ACTION <WM_CLOSE, 0, 0>
          _ACTION <WM_STICKY_PIN, 0, 0>
 
+    nid _NOTIFYICONDATAA <sizeof _NOTIFYICONDATAA, 0, 0, NIF_ICON or NIF_MESSAGE or NIF_TIP, WM_NOTIFY_ICON, 0, <"S","t","i","c","k","y","P","i","n">>
+
 .data?
     hInstance dq ?
     hDC dq ?
@@ -135,7 +138,6 @@ extern GetLastError:proc
     workarea _RECT <>
     rect _RECT <>
     paint _PAINT <>
-    nid _NOTIFYICONDATAA <>
     ii _ICONINFO <>
 
     mainWnd _WNDCLASSW <>
@@ -150,6 +152,12 @@ extern GetLastError:proc
 main proc
     mov rbp, rsp
     sub rsp, 28h
+
+    lea rcx, [mainClass]
+    lea rdx, [nid.szTip]
+    call FindWindowW
+    test rax, rax
+    jnz @exit
 
     xor rcx, rcx
     call GetModuleHandleW
@@ -168,15 +176,12 @@ main proc
     mov qword ptr [rsp + 58h], 0
     xor rcx, rcx
     lea rdx, [mainClass]
-    xor r8, r8
+    lea r8, [nid.szTip]
     xor r9, r9
     call CreateWindowExW
 
     mov rcx, NIM_ADD
-    mov [nid.cbSize], sizeof _NOTIFYICONDATAA
     mov [nid.hWnd], rax
-    mov [nid.uFlags], NIF_ICON or NIF_MESSAGE or NIF_TIP
-    mov [nid.uCallbackMessage], WM_NOTIFY_ICON
     lea rdx, [nid]
     call Shell_NotifyIconW
 
@@ -506,6 +511,7 @@ mainProc proc
 @WM_RBUTTONDOWN:
     xor rcx, rcx
     call PostQuitMessage
+    jmp @exit
 
 @exit:
     mov rsp, rbp
