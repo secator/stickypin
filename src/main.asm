@@ -506,7 +506,6 @@ mainProc proc
 @WM_RBUTTONDOWN:
     xor rcx, rcx
     call PostQuitMessage
-    jmp @exit
 
 @exit:
     mov rsp, rbp
